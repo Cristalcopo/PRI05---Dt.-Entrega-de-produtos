@@ -1,0 +1,99 @@
+[TIT]
+Alteração de data de entrega de produtos
+
+[VDD]
++> 1 : '[GRP_1]' = '0': E : Selecione um grupo de classificação! 
++> 2 : '[GRP_2]' = '0': E : Selecione um grupo de classificação! 
++> 3 : '[GRP_3]' = '0': E : Selecione um grupo de classificação! 
++> 4 :  [DIAS] = 0 OR [DIAS] IS NULL : E : Insira uma quantidade de dias para entrega do produto!
++> 5 : '[MOTIVO]' IS NULL : E : Insira um motivo para realizar a alteração!
+
+[PAR]
+[GRP_1] : Grupo de classificação 1: FK350 : (SELECT '0' cod_grp, '0 - NENHUM' grupo from dual UNION SELECT tci.COD_GRP_ITE cod_grp,tci.COD_GRP_ITE || ' - ' || tci.DESCRICAO grupo FROM focco3i.TGRP_CLAS_ITE tci WHERE LENGTH(tci.COD_GRP_ITE) = 2 AND tci.CLAS_ITE_ID = 147);cod_grp "Cod_grp#0",grupo "Grupo#50";cod_grp || chr(9) || grupo : : 1
+[GRP_2] : Grupo de classificação 2: FK350 : (SELECT '0' cod_grp2, '0 - NENHUM' grupo2 from dual UNION SELECT tci.COD_GRP_ITE cod_grp2,tci.COD_GRP_ITE || ' - ' || tci.DESCRICAO grupo2 FROM focco3i.TGRP_CLAS_ITE tci WHERE LENGTH(tci.COD_GRP_ITE) = 6 AND tci.CLAS_ITE_ID = 147 AND SUBSTR(TCI.COD_GRP_ITE,0,2) = '[GRP_1]');cod_grp2 "Cod_grp#0",grupo2 "Grupo#50";cod_grp2 || chr(9) || grupo2 : : 2
+[GRP_3] : Grupo de classificação 3: FK350 : (SELECT '0' cod_grp3, '0 - NENHUM' grupo3 from dual UNION SELECT tci.COD_GRP_ITE cod_grp3,tci.COD_GRP_ITE || ' - ' || tci.DESCRICAO grupo3 FROM focco3i.TGRP_CLAS_ITE tci WHERE LENGTH(tci.COD_GRP_ITE) = 10 AND tci.CLAS_ITE_ID = 147 AND SUBSTR(TCI.COD_GRP_ITE,0,6) = '[GRP_2]');cod_grp3 "Cod_grp#0",grupo3 "Grupo#50";cod_grp3 || chr(9) || grupo3 : : 3
+[GRP_4] : Grupo de classificação 4: FK350 : *(SELECT '0' cod_grp4, '0 - NENHUM' grupo4 from dual UNION SELECT tci.COD_GRP_ITE cod_grp4,tci.COD_GRP_ITE || ' - ' || tci.DESCRICAO grupo4 FROM focco3i.TGRP_CLAS_ITE tci WHERE LENGTH(tci.COD_GRP_ITE) > 10 AND tci.CLAS_ITE_ID = 147 AND SUBSTR(TCI.COD_GRP_ITE,0,10) = '[GRP_3]');cod_grp4 "Cod_grp#0",grupo4 "Grupo#50";cod_grp4 || chr(9) || grupo4
+[DIAS] : Dias de entrega : NM350 : 0;0;999 : : 4
+[MOTIVO]: Motivo : TX350 : 50;U: : 5
+
+
+
+[MII]
+    Deseja alterar dias de entrega para os grupos selecionados?
+
+[PLI]
+BEGIN
+
+  P_ALTERA_DIAS_ENTREGA([$SESSAO$],'[GRP_1]','[GRP_2]','[GRP_3]','[GRP_4]',[DIAS],'[MOTIVO]');
+
+END;
+
+[MIF]
+    Alterado a quantidade de dias de entrega para os itens a seguir!
+
+[SQL]
+    #> '[GRP_4]' <> '0' <#
+    WITH SPLIT_VALUES AS (
+        SELECT TRIM(REGEXP_SUBSTR('[GRP_4]', '[^,]+', 1, LEVEL)) AS VALUE
+        FROM DUAL
+        CONNECT BY REGEXP_SUBSTR('[GRP_4]', '[^,]+', 1, LEVEL) IS NOT NULL
+    )
+    SELECT TITENS_COMERCIAL.COD_ITEM "Item#5",
+           TITENS.DESC_TECNICA "Descrição#10",
+           TITENS_COMERCIAL.DIAS_ENTREGA_ESTIMADA "Dias de Entrega#5",
+           TGRP_CLAS_ITE.COD_GRP_ITE "Grupo#5",
+           '[MOTIVO]' "Motivo#5",
+           SYSDATE "Data de Alteração#D5"
+    FROM FOCCO3I.TITENS_COMERCIAL TITENS_COMERCIAL,
+         FOCCO3I.TGRP_CLAS_ITE TGRP_CLAS_ITE,
+         FOCCO3I.TITENS TITENS
+    WHERE TGRP_CLAS_ITE.ID = TITENS_COMERCIAL.GRP_CLAS_ID
+      AND TITENS.COD_ITEM = TITENS_COMERCIAL.COD_ITEM
+      AND TGRP_CLAS_ITE.CLAS_ITE_ID = 147
+      AND TGRP_CLAS_ITE.COD_GRP_ITE IN (
+        SELECT VALUE FROM SPLIT_VALUES)
+
+    #> '[GRP_3]' <> '0' <#
+        SELECT  TITENS_COMERCIAL.COD_ITEM "Item#5",
+                TITENS.DESC_TECNICA "Descrição#10",
+                TITENS_COMERCIAL.DIAS_ENTREGA_ESTIMADA "Dias de Entrega#5",
+                TGRP_CLAS_ITE.COD_GRP_ITE "Grupo#5",
+                '[MOTIVO]' "Motivo#5",
+                SYSDATE "Data de Alteração#D5"
+        FROM FOCCO3I.TITENS_COMERCIAL TITENS_COMERCIAL,
+                FOCCO3I.TGRP_CLAS_ITE TGRP_CLAS_ITE,
+                FOCCO3I.TITENS TITENS
+        WHERE TGRP_CLAS_ITE.ID = TITENS_COMERCIAL.GRP_CLAS_ID
+          AND TITENS.COD_ITEM = TITENS_COMERCIAL.COD_ITEM
+          AND TGRP_CLAS_ITE.CLAS_ITE_ID = 147
+          AND SUBSTR(TGRP_CLAS_ITE.COD_GRP_ITE,0,10) IN ('[GRP_3]')
+
+    #> '[GRP_2]' <> '0' <#
+        SELECT  TITENS_COMERCIAL.COD_ITEM "Item#5",
+                TITENS.DESC_TECNICA "Descrição#10",
+                TITENS_COMERCIAL.DIAS_ENTREGA_ESTIMADA "Dias de Entrega#5",
+                TGRP_CLAS_ITE.COD_GRP_ITE "Grupo#5",
+                '[MOTIVO]' "Motivo#5",
+                SYSDATE "Data de Alteração#D5"
+         FROM FOCCO3I.TITENS_COMERCIAL TITENS_COMERCIAL,
+              FOCCO3I.TGRP_CLAS_ITE TGRP_CLAS_ITE,
+              FOCCO3I.TITENS TITENS
+        WHERE TGRP_CLAS_ITE.ID = TITENS_COMERCIAL.GRP_CLAS_ID
+          AND TITENS.COD_ITEM = TITENS_COMERCIAL.COD_ITEM
+          AND TGRP_CLAS_ITE.CLAS_ITE_ID = 147
+          AND SUBSTR(TGRP_CLAS_ITE.COD_GRP_ITE,0,6) IN ('[GRP_2]')
+
+    #> '[GRP_1]' <> '0' <#
+        SELECT  TITENS_COMERCIAL.COD_ITEM "Item#5",
+                TITENS.DESC_TECNICA "Descrição#10",
+                TITENS_COMERCIAL.DIAS_ENTREGA_ESTIMADA "Dias de Entrega#5",
+                TGRP_CLAS_ITE.COD_GRP_ITE "Grupo#5",
+                '[MOTIVO]' "Motivo#5",
+                SYSDATE "Data de Alteração#D5"
+         FROM FOCCO3I.TITENS_COMERCIAL TITENS_COMERCIAL,
+              FOCCO3I.TGRP_CLAS_ITE TGRP_CLAS_ITE,
+              FOCCO3I.TITENS TITENS
+        WHERE TGRP_CLAS_ITE.ID = TITENS_COMERCIAL.GRP_CLAS_ID
+          AND TITENS.COD_ITEM = TITENS_COMERCIAL.COD_ITEM  
+          AND TGRP_CLAS_ITE.CLAS_ITE_ID = 147
+          AND SUBSTR(TGRP_CLAS_ITE.COD_GRP_ITE,0,2) IN ('[GRP_1]')

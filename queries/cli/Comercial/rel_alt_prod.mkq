@@ -1,0 +1,23 @@
+[TIT]
+Relatório de alteração de dias de entrega por classificação
+
+[PAR]
+[DT_INI] : Data início : DT250 :
+[DT_FIM] : Data Fim    : DT250 : 
+--[GRP_1] : Grupo de classificação 1: FK350 : (SELECT '0' cod_grp, '0 - NENHUM' grupo from dual UNION SELECT tci.COD_GRP_ITE cod_grp,tci.COD_GRP_ITE || ' - ' || tci.DESCRICAO grupo FROM focco3i.TGRP_CLAS_ITE tci WHERE LENGTH(tci.COD_GRP_ITE) = 2 AND tci.CLAS_ITE_ID = 147);cod_grp "Cod_grp#0",grupo "Grupo#50";cod_grp || chr(9) || grupo : : 1
+--[GRP_2] : Grupo de classificação 2: FK350 : (SELECT '0' cod_grp2, '0 - NENHUM' grupo2 from dual UNION SELECT tci.COD_GRP_ITE cod_grp2,tci.COD_GRP_ITE || ' - ' || tci.DESCRICAO grupo2 FROM focco3i.TGRP_CLAS_ITE tci WHERE LENGTH(tci.COD_GRP_ITE) = 6 AND tci.CLAS_ITE_ID = 147 AND SUBSTR(TCI.COD_GRP_ITE,0,2) = '[GRP_1]');cod_grp2 "Cod_grp#0",grupo2 "Grupo#50";cod_grp2 || chr(9) || grupo2 : : 2
+--[GRP_3] : Grupo de classificação 3: FK350 : (SELECT '0' cod_grp3, '0 - NENHUM' grupo3 from dual UNION SELECT tci.COD_GRP_ITE cod_grp3,tci.COD_GRP_ITE || ' - ' || tci.DESCRICAO grupo3 FROM focco3i.TGRP_CLAS_ITE tci WHERE LENGTH(tci.COD_GRP_ITE) = 10 AND tci.CLAS_ITE_ID = 147 AND SUBSTR(TCI.COD_GRP_ITE,0,6) = '[GRP_2]');cod_grp3 "Cod_grp#0",grupo3 "Grupo#50";cod_grp3 || chr(9) || grupo3 : : 3
+--[GRP_4] : Grupo de classificação 4: FK350 : *(SELECT '0' cod_grp4, '0 - NENHUM' grupo4 from dual UNION SELECT tci.COD_GRP_ITE cod_grp4,tci.COD_GRP_ITE || ' - ' || tci.DESCRICAO grupo4 FROM focco3i.TGRP_CLAS_ITE tci WHERE LENGTH(tci.COD_GRP_ITE) > 10 AND tci.CLAS_ITE_ID = 147 AND SUBSTR(TCI.COD_GRP_ITE,0,10) = '[GRP_3]');cod_grp4 "Cod_grp#0",grupo4 "Grupo#50";cod_grp4 || chr(9) || grupo4
+
+
+[SQL]
+SELECT SUBSTR(TDE.PARAMETROS,INSTR(TDE.PARAMETROS, ':')+2,2) "Grupo 1#10" ,
+	   SUBSTR(TDE.PARAMETROS,INSTR(TDE.PARAMETROS, 'Grupo 2')+9,6) "Grupo 2#10",
+	   SUBSTR(TDE.PARAMETROS,INSTR(TDE.PARAMETROS, 'Grupo 3')+9,10) "Grupo 3#10",
+	   SUBSTR(TDE.PARAMETROS,INSTR(TDE.PARAMETROS, 'Grupo 4')+9,200) "Grupo 4#10",
+	   TDE.DT_ALTERACAO,
+	   TDE.MOTIVO,
+	   TDE.DIAS,
+	   TDE.USUARIO
+ FROM TMOTIVOS_DIAS_ENTREGAS TDE
+ WHERE TRUNC(TDE.DT_ALTERACAO) BETWEEN TO_DATE('[DT_INI]','DD/MM/YYYY') AND TO_DATE('[DT_FIM]','DD/MM/YYYY')

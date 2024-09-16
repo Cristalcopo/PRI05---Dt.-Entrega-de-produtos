@@ -1,0 +1,123 @@
+
+CREATE OR REPLACE PROCEDURE OTIMIZA.P_ALTERA_DIAS_ENTREGA ( PI_SESSAO IN NUMBER,
+													PI_GRP1 IN VARCHAR2,
+													PI_GRP2 IN VARCHAR2,
+													PI_GRP3 IN VARCHAR2,
+													PI_GRP4 IN VARCHAR2,
+													PI_DIAS IN NUMBER,
+													PI_MOTIVO IN VARCHAR2
+													) IS
+													
+	AUX_GRP4 VARCHAR2(1000):= null;
+	ERRO VARCHAR2(4000);
+
+BEGIN
+	
+	CASE  WHEN PI_GRP4 <> '0' THEN
+	
+			IF LENGTH(PI_GRP4) > 15 THEN 
+				AUX_GRP4 := regexp_replace(PI_GRP4, '([^,]+)', '''\1''');
+			
+			
+			UPDATE FOCCO3I.TITENS_COMERCIAL
+					   SET DIAS_ENTREGA_ESTIMADA = PI_DIAS
+					 WHERE GRP_CLAS_ID IN (SELECT DISTINCT ID 
+					   						FROM FOCCO3I.TGRP_CLAS_ITE
+					   					   WHERE CLAS_ITE_ID = 147
+					  						 AND COD_GRP_ITE IN ( '' ||regexp_replace(PI_GRP4, '([^,]+)', '''\1''')) || '');
+					  COMMIT;
+			
+		    ELSE
+		    
+		    UPDATE FOCCO3I.TITENS_COMERCIAL
+					   SET DIAS_ENTREGA_ESTIMADA = PI_DIAS
+					 WHERE GRP_CLAS_ID IN (SELECT ID 
+					   						FROM FOCCO3I.TGRP_CLAS_ITE
+					   					   WHERE CLAS_ITE_ID = 147
+					  						 AND COD_GRP_ITE IN (PI_GRP4));
+					  COMMIT;
+			
+			END IF;
+	
+				
+		  WHEN PI_GRP3 <> '0' THEN
+	
+				UPDATE FOCCO3I.TITENS_COMERCIAL
+					   SET DIAS_ENTREGA_ESTIMADA = PI_DIAS
+					 WHERE GRP_CLAS_ID = (SELECT ID 
+					   						FROM FOCCO3I.TGRP_CLAS_ITE
+					   					   WHERE ID = TITENS_COMERCIAL.GRP_CLAS_ID
+					   					     AND CLAS_ITE_ID = 147
+					  						 AND SUBSTR(COD_GRP_ITE,0,10) IN (PI_GRP3));
+					  COMMIT;
+	
+	
+	       WHEN PI_GRP2 <> '0' THEN
+	
+				UPDATE FOCCO3I.TITENS_COMERCIAL
+				   SET DIAS_ENTREGA_ESTIMADA = PI_DIAS
+				 WHERE GRP_CLAS_ID = (SELECT ID 
+				   						FROM FOCCO3I.TGRP_CLAS_ITE
+				   					   WHERE ID = TITENS_COMERCIAL.GRP_CLAS_ID
+				   					     AND CLAS_ITE_ID = 147
+				  						 AND SUBSTR(COD_GRP_ITE,0,6) IN (PI_GRP2));
+				  COMMIT;
+	
+
+		   WHEN PI_GRP1 <> '0' THEN
+	
+				UPDATE FOCCO3I.TITENS_COMERCIAL
+				   SET DIAS_ENTREGA_ESTIMADA = PI_DIAS
+				 WHERE GRP_CLAS_ID = (SELECT ID 
+				   						FROM FOCCO3I.TGRP_CLAS_ITE
+				   					   WHERE ID = TITENS_COMERCIAL.GRP_CLAS_ID
+				   					     AND CLAS_ITE_ID = 147
+				   					     AND SUBSTR(COD_GRP_ITE,0,2) = PI_GRP1);
+				  COMMIT;
+	   
+
+	
+	END CASE;
+
+--INSERT INTO SQL_TESTE(SQL_TESTE) VALUES (AUX_GRP4);
+
+	INSERT INTO TMOTIVOS_DIAS_ENTREGAS(ID,
+									   SESSAO,
+									   DT_ALTERACAO,
+									   MOTIVO,
+									   USUARIO,
+									   PARAMETROS,
+									   DIAS) VALUES
+									  (MOT_DIAS_ENTR_SK.NEXTVAL,
+									   PI_SESSAO,
+									   SYSDATE,
+									   PI_MOTIVO,
+									   OTM_RET_USER_FC(),
+									   'Grupo 1: ' || PI_GRP1 || ' - Grupo 2: ' || PI_GRP2 || ' - Grupo 3: ' || PI_GRP3 || ' Grupo 4: ' || PI_GRP4,
+									   PI_DIAS);
+    COMMIT;
+   
+   EXCEPTION 
+   	 WHEN OTHERS THEN
+		ERRO := SQLERRM;
+	
+	INSERT INTO T_ERROS_ROTINAS_OTM(ID,
+									DT_ERRO,
+									ERRO,
+									TELA,
+									PARAMETROS,
+									SESSAO,
+									USUARIO)
+									VALUES(
+									ERROS_ROTINAS_OTM_SK.NEXTVAL,
+									SYSDATE,
+									ERRO,
+									'ALTERAR DIAS DE ENTREGA',
+									'Grupo 1: ' || PI_GRP1 || ' - Grupo 2: ' || PI_GRP2 || ' - Grupo 3: ' || PI_GRP3 || ' Grupo 4: ' || PI_GRP4 || ' - Dias' ||
+									TO_CHAR(PI_DIAS) || ' - Motivo: ' || PI_MOTIVO ,
+									PI_SESSAO,
+									OTM_RET_USER_FC());
+
+		COMMIT;
+   
+END;
