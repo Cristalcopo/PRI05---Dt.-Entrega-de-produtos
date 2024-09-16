@@ -1,0 +1,32 @@
+﻿#%C/Logotipo; Comercial; %SVGF/Solid/handshake; Visualizar menu; Controlar Acesso
+
+--0	;Usuários & Acessibilidade				;Usuários & Acessibilidade  	;MENU_000									;%SVGF/Solid/users
+--0.G	;Grupos								;Grupos			  				;MKQ:System/SYS_Grupos						;%SVGF/Solid/user-friends ; CTRL+G
+--0.U	;Usuários							;Usuários		  				;MKQ:System/SYS_Usuarios					;%SVGF/Solid/user-tag     ; CTRL+U
+--0.A	;Acessibilidade						;Acessibilidade  				;MKQ:System/SYS_Acessos						;%SVGF/Solid/user-check   ; ALT+A
+
+1     ;Relatórios ;Relatórios ;MENU_16 ; %SVGI/ios-people ; 
+1.1   ;Carteira de Pedidos ;Carteira de Pedidos                  ;MKQ:cli/representantes/carteira_pdv2 ; %SVGI/md-paper
+1.2   ;Relatório de Faturamento ;Relatório de Faturamento                  ;MKQ:cli/representantes/rel_faturamento2 ; %SVGI/ios-paper
+1.3   ;Raio X do Cliente ;Raio X do Cliente                  ;MKQ:cli/representantes/raio_x_cliente2 ; %SVGI/ios-person
+1.4   ;Acompanhamento Plano ;Acompanhamento Plano              ;MKQ:cli/representantes/acompanha_plano               ;%SVGD/papel
+2 ;Previsão de Vendas            ;Previsão de Vendas            ;MKQ:CLI/Comercial/prev_venda;%SVGD/calendario_vazio
+3 ;Promessa de Entrega        ;Promessa de Entrega            ;MKQ:CLI/Comercial/promessa_entrega;%SVGD/Calendario_Preenchido
+4 ;Capacidade Prometiva               ;Capacidade Prometiva ;MKQ:cli/Comercial/capacidade_prom         ;%SVGD/Tanque
+
+5 ; Classificação de itens; Classificação de itens; MENU_17 ; %SVGC/icone/Class;
+5.1   ;Data de entrega de produtos;Data de entrega de produtos;MKQ:cli/Comercial/alt_dat_prod;%SVGC/icone/lib-com/date-range-svgrepo
+5.2   ;Rel. alt. dias entrega;Rel. alt. dias entrega;MKQ:cli/Comercial/rel_alt_prod;%SVGC/icone/Report
+
+---3 ;Manuteção Promessa de Entrega por Representante ;Manutenção Promessa de Entrega por Representante     ;MKQ:CLI/Comercial/manut_promessa_entrega;%SVGD/chave_fenda
+--5 ;Manut. Promessa de Entrega ;Manut. Promessa de Entrega     ;MKQ:CLI/Comercial/manut_promessa_entrega_semana;%SVGD/chave_boca
+--6 ;Painel Promessa de Entrega ;PainelmPromessa de Entrega ;MKQ:CLI/Comercial/painel_promessa_entrega ;%SVGD/PAPEL
+--7 ;Painel Promessa de Entrega Dia ;Painel Promessa de Entrega Dia;MKQ:CLI/Comercial/painel_promessa_entrega_sem;%SVGI/ios-today
+--8 ;Promessa não Atendidas             ;Promessa não Atendidas             ;MKQ:CLI/Comercial/promessa_nao_atend ;%SVGI/ios-close-circle-outline 
+--------- VER SE VAI TER 8 ;Análise Fatur. Forecast        ;Análise Fatur. Forecast      ;MKQ:CLI/Comercial/com_analise_forecast ;%SVGF/regular/compass
+9 ;Cadastro de Previsão de Venda ;Cadastro de Previsão de Venda ;MKQ:CLI/Comercial/cadastro_metas       ;%SVGF/regular/newspaper
+
+
+---SVGI/ios-today
+98	  ;Favoritos							;Favoritos						;MKP:!System/Favoritos						;%SVGI/md-star
+99	  ;Help									;Help							;HLP                                		;%SVGI/md-help-circle-outline
