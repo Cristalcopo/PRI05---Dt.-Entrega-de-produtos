@@ -8,23 +8,50 @@ CREATE OR REPLACE PROCEDURE OTIMIZA.P_ALTERA_DIAS_ENTREGA ( PI_SESSAO IN NUMBER,
 													PI_MOTIVO IN VARCHAR2
 													) IS
 													
-	AUX_GRP4 VARCHAR2(1000):= null;
+	AUX_GRP4 VARCHAR2(1000):= PI_GRP4;
+    AUX_GRP4_1 VARCHAR2(1000):= null;
 	ERRO VARCHAR2(4000);
+    FIM_WHILE NUMBER := 0;
 
 BEGIN
 	
 	CASE  WHEN PI_GRP4 <> '0' THEN
 	
 			IF LENGTH(PI_GRP4) > 15 THEN 
-				AUX_GRP4 := regexp_replace(PI_GRP4, '([^,]+)', '''\1''');
+
 			
+			WHILE FIM_WHILE <> 1 
+			 	LOOP 
+			 	    AUX_GRP4_1 := SUBSTR(AUX_GRP4,0,INSTR(AUX_GRP4,',')-1);
+				 	AUX_GRP4 := SUBSTR(AUX_GRP4,INSTR(AUX_GRP4,',')+1,LENGTH(AUX_GRP4));
+				 
+				 UPDATE FOCCO3I.TITENS_COMERCIAL
+					   SET DIAS_ENTREGA_ESTIMADA = PI_DIAS
+					 WHERE GRP_CLAS_ID IN (SELECT DISTINCT ID 
+					   						FROM FOCCO3I.TGRP_CLAS_ITE
+					   					   WHERE CLAS_ITE_ID = 147
+					  						 AND COD_GRP_ITE IN (AUX_GRP4_1));
+					  COMMIT;
+				 
+				 	IF length(AUX_GRP4) = 15 THEN
+				 		FIM_WHILE := 1;
+				 	     UPDATE FOCCO3I.TITENS_COMERCIAL
+						   SET DIAS_ENTREGA_ESTIMADA = PI_DIAS
+						 WHERE GRP_CLAS_ID IN (SELECT DISTINCT ID 
+					   						FROM FOCCO3I.TGRP_CLAS_ITE
+					   					   WHERE CLAS_ITE_ID = 147
+					  						 AND COD_GRP_ITE IN (AUX_GRP4));
+						  COMMIT;
+				 	END IF;
+				 
+			 	END LOOP;
 			
 			UPDATE FOCCO3I.TITENS_COMERCIAL
 					   SET DIAS_ENTREGA_ESTIMADA = PI_DIAS
 					 WHERE GRP_CLAS_ID IN (SELECT DISTINCT ID 
 					   						FROM FOCCO3I.TGRP_CLAS_ITE
 					   					   WHERE CLAS_ITE_ID = 147
-					  						 AND COD_GRP_ITE IN ( '' ||regexp_replace(PI_GRP4, '([^,]+)', '''\1''')) || '');
+					  						 AND COD_GRP_ITE IN (AUX_GRP4));
 					  COMMIT;
 			
 		    ELSE
